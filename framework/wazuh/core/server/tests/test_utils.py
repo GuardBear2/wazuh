@@ -94,14 +94,13 @@ def test_get_manager_status():
     for value in status.values():
         assert value == 'stopped'
 
-    with patch('wazuh.core.cluster.utils.glob', return_value=['ossec-0.pid']):
+    with patch('wazuh.core.server.utils.glob', return_value=['ossec-0.pid']):
         with patch('re.match', return_value='None'):
             status = utils.get_manager_status()
             for value in status.values():
                 assert value == 'failed'
 
-        # with patch('wazuh.core.cluster.utils.join', return_value='failed') as join_mock:
-        with patch('wazuh.core.cluster.utils.os.path.exists', side_effect=exist_mock):
+        with patch('wazuh.core.server.utils.os.path.exists', side_effect=exist_mock):
             status = utils.get_manager_status()
             for value in status.values():
                 assert value == 'failed'
@@ -125,13 +124,7 @@ def test_get_manager_status():
 @pytest.mark.parametrize('exc', [PermissionError, FileNotFoundError])
 @patch('os.stat')
 def test_get_manager_status_ko(mock_stat, exc):
-    """Check that get_manager_status function correctly handles expected exceptions.
-
-    Parameters
-    ----------
-    exc : Exception
-        Expected exception to be handled.
-    """
+    """Check that get_manager_status function correctly handles expected exceptions."""
     mock_stat.side_effect = exc
     with pytest.raises(WazuhInternalError, match='.* 1913 .*'):
         utils.get_manager_status()
@@ -139,7 +132,7 @@ def test_get_manager_status_ko(mock_stat, exc):
 
 def test_manager_restart():
     """Verify that manager_restart send to the manager the restart request."""
-    with patch('wazuh.core.cluster.utils.open', side_effect=None):
+    with patch('wazuh.core.server.utils.open', side_effect=None):
         with patch('fcntl.lockf', side_effect=None):
             with pytest.raises(WazuhInternalError, match='.* 1901 .*'):
                 utils.manager_restart()
@@ -157,22 +150,22 @@ def test_manager_restart():
                         assert WazuhResult({'message': 'Restart request sent'}) == status
 
 
-def test_ClusterFilter():
-    """Verify that ClusterFilter adds cluster related information into cluster logs."""
-    cluster_filter = utils.ClusterFilter(tag='Cluster', subtag='config')
-    record = utils.ClusterFilter(tag='Testing', subtag='config')
+def test_server_filter():
+    """Verify that ServerFilter adds server related information into the logs."""
+    server_filter = utils.ServerFilter(tag='Server', subtag='config')
+    record = utils.ServerFilter(tag='Testing', subtag='config')
     record.update_tag(new_tag='Testing_tag')
     record.update_subtag(new_subtag='Testing_subtag')
 
-    assert cluster_filter.filter(record=record)
+    assert server_filter.filter(record=record)
 
 
-def test_ClusterLogger():
-    """Verify that ClusterLogger defines the logger used by wazuh-server."""
-    cluster_logger = utils.ClusterLogger(
+def test_server_logger():
+    """Verify that ServerLogger defines the logger used by wazuh-server."""
+    server_logger = utils.ServerLogger(
         tag='%(asctime)s %(levelname)s: [%(tag)s] [%(subtag)s] %(message)s', debug_level=1
     )
-    cluster_logger.setup_logger()
+    server_logger.setup_logger()
 
 
 @pytest.mark.parametrize(
