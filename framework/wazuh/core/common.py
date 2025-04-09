@@ -166,7 +166,6 @@ def get_context_cache() -> dict:
 rbac: ContextVar[Dict] = ContextVar('rbac', default={'rbac_mode': 'black'})
 current_user: ContextVar[str] = ContextVar('current_user', default='')
 broadcast: ContextVar[bool] = ContextVar('broadcast', default=False)
-cluster_nodes: ContextVar[list] = ContextVar('cluster_nodes', default=list())
 origin_module: ContextVar[str] = ContextVar('origin_module', default='framework')
 try:
     mp_pools: ContextVar[Dict] = ContextVar(
@@ -210,8 +209,6 @@ WAZUH_ETC = ETC_ROOT / WAZUH_SERVER
 WAZUH_RUN = RUN_ROOT / WAZUH_SERVER
 WAZUH_LOG = VAR_LOG / WAZUH_SERVER
 WAZUH_LIB = VAR_LIB / WAZUH_SERVER
-
-WAZUH_QUEUE = WAZUH_RUN / 'cluster'
 
 WAZUH_GROUPS = WAZUH_ETC / 'groups'
 
