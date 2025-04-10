@@ -17,10 +17,6 @@ with patch('wazuh.core.common.getgrnam'):
                     CentralizedConfig._config = default_config
                     sys.modules['wazuh.rbac.orm'] = MagicMock()
 
-                    from wazuh.core.exception import (
-                        WazuhInternalError,
-                    )
-                    from wazuh.core.results import WazuhResult
                     from wazuh.core.server import utils
 
 
@@ -66,85 +62,6 @@ def test_ping_unix_socket_error():
 
         assert not utils.ping_unix_socket(socket_path)
         mock_client.connect.assert_called_once_with(str(socket_path))
-
-
-def test_get_manager_status():
-    """Check that get_manager_status function returns the manager status.
-
-    For this test, the status can be stopped or failed.
-    """
-    called = 0
-
-    def exist_mock(path):
-        if '.failed' in path and called == 0:
-            return True
-        elif '.restart' in path and called == 1:
-            return True
-        elif '.start' in path and called == 2:
-            return True
-        elif '/proc' in path and called == 3:
-            return True
-        else:
-            return False
-
-    status = utils.get_manager_status()
-    for value in status.values():
-        assert value == 'stopped'
-
-    with patch('wazuh.core.server.utils.glob', return_value=['ossec-0.pid']):
-        with patch('re.match', return_value='None'):
-            status = utils.get_manager_status()
-            for value in status.values():
-                assert value == 'failed'
-
-        with patch('wazuh.core.server.utils.os.path.exists', side_effect=exist_mock):
-            status = utils.get_manager_status()
-            for value in status.values():
-                assert value == 'failed'
-
-            called += 1
-            status = utils.get_manager_status()
-            for value in status.values():
-                assert value == 'restarting'
-
-            called += 1
-            status = utils.get_manager_status()
-            for value in status.values():
-                assert value == 'starting'
-
-            called += 1
-            status = utils.get_manager_status()
-            for value in status.values():
-                assert value == 'running'
-
-
-@pytest.mark.parametrize('exc', [PermissionError, FileNotFoundError])
-@patch('os.stat')
-def test_get_manager_status_ko(mock_stat, exc):
-    """Check that get_manager_status function correctly handles expected exceptions."""
-    mock_stat.side_effect = exc
-    with pytest.raises(WazuhInternalError, match='.* 1913 .*'):
-        utils.get_manager_status()
-
-
-def test_manager_restart():
-    """Verify that manager_restart send to the manager the restart request."""
-    with patch('wazuh.core.server.utils.open', side_effect=None):
-        with patch('fcntl.lockf', side_effect=None):
-            with pytest.raises(WazuhInternalError, match='.* 1901 .*'):
-                utils.manager_restart()
-
-            with patch('os.path.exists', return_value=True):
-                with pytest.raises(WazuhInternalError, match='.* 1902 .*'):
-                    utils.manager_restart()
-
-                with patch('socket.socket.connect', side_effect=None):
-                    with pytest.raises(WazuhInternalError, match='.* 1014 .*'):
-                        utils.manager_restart()
-
-                    with patch('socket.socket.send', side_effect=None):
-                        status = utils.manager_restart()
-                        assert WazuhResult({'message': 'Restart request sent'}) == status
 
 
 def test_server_filter():
