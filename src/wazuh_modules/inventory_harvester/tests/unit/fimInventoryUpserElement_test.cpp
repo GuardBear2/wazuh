@@ -50,6 +50,7 @@ TEST_F(FimInventoryUpsertElement, valid_Registry)
     EXPECT_CALL(*context, agentId()).WillRepeatedly(testing::Return("001"));
     EXPECT_CALL(*context, agentIp()).WillRepeatedly(testing::Return("agentIp"));
     EXPECT_CALL(*context, path()).WillRepeatedly(testing::Return("HKLM\\Software\\App"));
+    EXPECT_CALL(*context, pathId()).WillRepeatedly(testing::Return("HKLM/Software/App"));
     EXPECT_CALL(*context, agentName()).WillRepeatedly(testing::Return("agent-reg"));
     EXPECT_CALL(*context, agentVersion()).WillRepeatedly(testing::Return("agentVersion"));
     EXPECT_CALL(*context, hive()).WillRepeatedly(testing::Return("HKLM"));
@@ -65,7 +66,7 @@ TEST_F(FimInventoryUpsertElement, valid_Registry)
 
     EXPECT_EQ(
         context->m_serializedElement,
-        R"({"id":"001_HKLM\\Software\\App","operation":"INSERTED","data":{"agent":{"id":"001","name":"agent-reg","host":{"ip":"agentIp"},"version":"agentVersion"},"registry":{"key":"Software\\App","hive":"HKLM","gid":"gid","group":"groupName","uid":"uid","owner":"userName","architecture":"x86","mtime":"2025-04-09T15:45:00Z"},"wazuh":{"schema":{"version":"1.0"}}}})");
+        R"({"id":"001_HKLM/Software/App","operation":"INSERTED","data":{"agent":{"id":"001","name":"agent-reg","host":{"ip":"agentIp"},"version":"agentVersion"},"registry":{"key":"Software\\App","hive":"HKLM","gid":"gid","group":"groupName","uid":"uid","owner":"userName","architecture":"x86","mtime":"2025-04-09T15:45:00Z"},"wazuh":{"schema":{"version":"1.0"}}}})");
 }
 
 /*
@@ -99,6 +100,7 @@ TEST_F(FimInventoryUpsertElement, valid_File)
 
     // File-specific fields
     EXPECT_CALL(*context, path()).WillRepeatedly(testing::Return("/etc/hosts"));
+    EXPECT_CALL(*context, pathId()).WillRepeatedly(testing::Return("/etc/hosts"));
     EXPECT_CALL(*context, sha1()).WillRepeatedly(testing::Return("sha1-file"));
     EXPECT_CALL(*context, sha256()).WillRepeatedly(testing::Return("sha256-file"));
     EXPECT_CALL(*context, md5()).WillRepeatedly(testing::Return("md5-file"));
@@ -146,6 +148,7 @@ TEST_F(FimInventoryUpsertElement, valid_RegistryWithValue)
 
     // Registry info
     EXPECT_CALL(*context, path()).WillRepeatedly(testing::Return("HKLM\\Software\\App"));
+    EXPECT_CALL(*context, pathId()).WillRepeatedly(testing::Return("HKLM/Software/App"));
     EXPECT_CALL(*context, key()).WillRepeatedly(testing::Return("Software\\App"));
     EXPECT_CALL(*context, hive()).WillRepeatedly(testing::Return("HKLM"));
     EXPECT_CALL(*context, valueName()).WillRepeatedly(testing::Return("InstallPath"));
@@ -160,5 +163,5 @@ TEST_F(FimInventoryUpsertElement, valid_RegistryWithValue)
 
     EXPECT_EQ(
         context->m_serializedElement,
-        R"({"id":"001_HKLM\\Software\\App","operation":"INSERTED","data":{"agent":{"id":"001","name":"agent-reg","host":{"ip":"10.10.10.10"},"version":"v4.9.0"},"registry":{"key":"Software\\App","value":"InstallPath","hive":"HKLM","path":"HKLM\\Software\\App","data":{"hash":{"md5":"md5value","sha1":"sha1value","sha256":"sha256value"},"type":"REG_SZ"}},"wazuh":{"schema":{"version":"1.0"}}}})");
+        R"({"id":"001_HKLM/Software/App","operation":"INSERTED","data":{"agent":{"id":"001","name":"agent-reg","host":{"ip":"10.10.10.10"},"version":"v4.9.0"},"registry":{"key":"Software\\App","value":"InstallPath","hive":"HKLM","path":"HKLM\\Software\\App","data":{"hash":{"md5":"md5value","sha1":"sha1value","sha256":"sha256value"},"type":"REG_SZ"}},"wazuh":{"schema":{"version":"1.0"}}}})");
 }

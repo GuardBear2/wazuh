@@ -42,7 +42,7 @@ public:
 
         element.id = data->agentId();
         element.id += "_";
-        element.id += data->path();
+        element.id += data->pathId();
         element.operation = "INSERTED";
 
         element.data.agent.id = data->agentId();
@@ -82,7 +82,7 @@ public:
         element.operation = "DELETED";
         element.id = data->agentId();
         element.id += "_";
-        element.id += data->path();
+        element.id += data->pathId();
         return element;
     }
 };

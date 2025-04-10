@@ -154,19 +154,26 @@ TEST_F(FimInventoryUtils, AppendsValueNameIfRegistryOrigin)
 {
     std::string registryPath = "HKEY_USERS\\App\\Settings";
     FimContextUtils::sanitizePath(registryPath, true, "DataValue");
-    EXPECT_EQ(registryPath, "HKU\\App\\Settings/DataValue");
+    EXPECT_EQ(registryPath, "HKU\\App\\Settings\\DataValue");
+}
+
+TEST_F(FimInventoryUtils, AppendsValueNameIfRegistryOriginIsId)
+{
+    std::string registryPath = "HKEY_USERS\\App\\Settings";
+    FimContextUtils::sanitizePath(registryPath, true, "DataValue", true);
+    EXPECT_EQ(registryPath, "HKU/App/Settings/DataValue");
 }
 
 TEST_F(FimInventoryUtils, AppendsSlashEvenIfValueNameIsEmpty)
 {
     std::string registryPath = "HKEY_USERS\\App\\Settings";
     FimContextUtils::sanitizePath(registryPath, true, "");
-    EXPECT_EQ(registryPath, "HKU\\App\\Settings/");
+    EXPECT_EQ(registryPath, "HKU\\App\\Settings\\");
 }
 
 TEST_F(FimInventoryUtils, EmptyStringInput)
 {
     std::string registryPath;
     FimContextUtils::sanitizePath(registryPath, true, "Value");
-    EXPECT_EQ(registryPath, "/Value");
+    EXPECT_EQ(registryPath, "\\Value");
 }

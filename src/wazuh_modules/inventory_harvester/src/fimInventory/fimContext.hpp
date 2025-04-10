@@ -57,8 +57,12 @@ namespace FimContextUtils
      * @param input The registry path to sanitize.
      * @param isOriginRegistry Indicates if the path is from the origin registry.
      * @param valueName The value name to append if isOriginRegistry is true.
+     * @param isIdIdentifier Indicates if the path is an ID identifier.
      */
-    void sanitizePath(std::string& input, bool isOriginRegistry, std::string_view valueName = "")
+    void sanitizePath(std::string& input,
+                      bool isOriginRegistry,
+                      std::string_view valueName = "",
+                      bool isIdIdentifier = false)
     {
         static const std::map<std::string_view, std::string_view, std::less<>> HIVES = {
             {"HKEY_CLASSES_ROOT", "HKCR"},
@@ -67,7 +71,7 @@ namespace FimContextUtils
             {"HKEY_USERS", "HKU"},
             {"HKEY_CURRENT_CONFIG", "HKCC"}};
 
-        Utils::replaceAll(input, "\\\\", "\\");
+        isIdIdentifier ? Utils::replaceAll(input, "\\", "/") : Utils::replaceAll(input, "\\\\", "\\");
         Utils::replaceAll(input, "//", "/");
 
         for (const auto& [key, val] : HIVES)
@@ -80,7 +84,7 @@ namespace FimContextUtils
 
         if (isOriginRegistry)
         {
-            input += "/";
+            isIdIdentifier ? input += "/" : input += "\\";
             input += valueName;
         }
     }
@@ -720,6 +724,16 @@ public:
         return m_pathSanitized;
     }
 
+    std::string_view pathId()
+    {
+        if (m_pathId.empty())
+        {
+            m_pathId = pathRaw();
+            FimContextUtils::sanitizePath(m_pathId, m_originTable == OriginTable::RegistryValue, valueName(), true);
+        }
+        return m_pathId;
+    }
+
     std::string_view mtimeISO8601()
     {
         if (m_mtimeISO8601.empty())
@@ -772,6 +786,7 @@ private:
 
     // Allocations to mantain the lifetime of the data.
     std::string m_pathSanitized;
+    std::string m_pathId;
     std::string m_valueNameSanitized;
     std::string m_mtimeISO8601;
     std::string m_keySanitized;
