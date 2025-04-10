@@ -18,10 +18,7 @@ with patch('wazuh.core.common.getgrnam'):
                     sys.modules['wazuh.rbac.orm'] = MagicMock()
 
                     from wazuh.core.exception import (
-                        WazuhError,
                         WazuhInternalError,
-                        WazuhPermissionError,
-                        WazuhResourceNotFound,
                     )
                     from wazuh.core.results import WazuhResult
                     from wazuh.core.server import utils
@@ -166,25 +163,3 @@ def test_server_logger():
         tag='%(asctime)s %(levelname)s: [%(tag)s] [%(subtag)s] %(message)s', debug_level=1
     )
     server_logger.setup_logger()
-
-
-@pytest.mark.parametrize(
-    'result',
-    [
-        WazuhError(6001),
-        WazuhInternalError(1000),
-        WazuhPermissionError(4000),
-        WazuhResourceNotFound(1710),
-        'value',
-        1,
-        False,
-        {'key': 'value'},
-    ],
-)
-def test_raise_if_exc(result):
-    """Check that raise_if_exc raises an exception if the result is one."""
-    if isinstance(result, Exception):
-        with pytest.raises(Exception):
-            utils.raise_if_exc(result)
-    else:
-        utils.raise_if_exc(result)
