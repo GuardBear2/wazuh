@@ -35,6 +35,11 @@ public:
     {
         DataHarvester<FimFileInventoryHarvester> element;
 
+        if (data->agentId().empty())
+        {
+            throw std::runtime_error("Agent ID is empty, cannot upsert file element.");
+        }
+
         element.id = data->agentId();
         element.id += "_";
         element.id += data->path();

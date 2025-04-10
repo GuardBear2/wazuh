@@ -34,6 +34,12 @@ public:
     static DataHarvester<FimRegistryInventoryHarvester> build(TContext* data)
     {
         DataHarvester<FimRegistryInventoryHarvester> element;
+
+        if (data->agentId().empty())
+        {
+            throw std::runtime_error("Agent ID is empty, cannot upsert registry key element.");
+        }
+
         element.id = data->agentId();
         element.id += "_";
         element.id += data->path();
