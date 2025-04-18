@@ -8,7 +8,7 @@ else
     exit 1
 fi
 GITHUB_REPOSITORY="GuardBear2/SIEM"
-GITHUB_OWNER="GuardBear2"
+GITHUB_OWNER="wazuh"
 IMAGE_ID=ghcr.io/${GITHUB_OWNER}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 IMAGE_ID=$(echo ${IMAGE_ID} | tr '[A-Z]' '[a-z]')
 
