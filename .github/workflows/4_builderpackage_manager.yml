@@ -112,15 +112,11 @@ jobs:
           else echo "TAG=${{ inputs.docker_image_tag }}" >> $GITHUB_ENV; fi
           echo "CONTAINER_NAME=pkg_${{ inputs.system }}_manager_builder_amd64" >> $GITHUB_ENV
 
-      - name: Download docker image for package building
-        run: |
-          bash $GITHUB_WORKSPACE/.github/actions/ghcr-pull-and-push/pull_image_from_ghcr.sh ${{ secrets.GITHUB_TOKEN }} ${{ github.actor}} $CONTAINER_NAME ${{ env.TAG }}
-
       - name: Build ${{ inputs.system }} wazuh-manager on ${{ inputs.architecture }}
         working-directory: packages
         run: |
           REVISION=${{ inputs.revision }}
-          FLAGS="-t manager -s /tmp --dont-build-docker -j $(nproc) "
+          FLAGS="-t manager -s /tmp -j $(nproc) "
           if [ -z "$REVISION" ]; then FLAGS+="-r 0 "; else FLAGS+="-r $REVISION "; fi
           if [ "${{ inputs.is_stage }}" == "true" ]; then FLAGS+="--is_stage "; fi
           if [ "${{ inputs.checksum }}" == "true" ]; then FLAGS+="--checksum "; fi
