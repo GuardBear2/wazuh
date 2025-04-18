@@ -8,8 +8,8 @@ if [ -n "$5" ]; then
 else
     exit 1
 fi
-GITHUB_REPOSITORY="GuardBear2/wazuh"
-GITHUB_OWNER="GuardBear2"
+GITHUB_REPOSITORY="guardbear2/wazuh"
+GITHUB_OWNER="guardbear2"
 IMAGE_ID=ghcr.io/${GITHUB_OWNER}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
 IMAGE_ID=$(echo ${IMAGE_ID} | tr '[A-Z]' '[a-z]')
 
